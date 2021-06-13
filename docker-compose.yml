@@ -36,3 +36,4 @@ services:
       - 2181:2181
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+      ZOO_4LW_COMMANDS_WHITELIST: mntr,conf,ruok
