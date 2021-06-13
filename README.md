@@ -72,7 +72,7 @@ When referencing a particular Lucene branch, for example `main`, from Solr, Grad
 
 ## License
 
-MIT
+Apache-2.0 License
 
 ## Author
 
