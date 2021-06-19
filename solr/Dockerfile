@@ -15,7 +15,7 @@ ENV JAVA_HOME="/usr/lib/jvm/java-11-openjdk" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
-    PATH="/opt/solr/bin:$PATH" \
+    PATH="/opt/solr/bin:/opt/mnt/bin:$PATH" \
     SOLR_INCLUDE="/etc/default/solr.in.sh" \
     SOLR_HOME="/var/solr/data" \
     SOLR_PID_DIR="/var/solr" \
@@ -47,18 +47,22 @@ RUN set -ex && \
     cp /opt/solr/bin/solr.in.sh /etc/default/solr.in.sh && \
     chown 0:0 /etc/default/solr.in.sh && \
     chmod 0664 /etc/default/solr.in.sh && \
-    mkdir -p $SOLR_HOME $SOLR_LOGS_DIR && \
+    mkdir -p $SOLR_HOME $SOLR_LOGS_DIR /opt/mnt/bin && \
     cp /opt/solr/server/solr/solr.xml /opt/solr/server/solr/zoo.cfg $SOLR_HOME && \
     cp /opt/solr/server/resources/log4j2.xml $LOG4J_PROPS && \
     chown -R $SOLR_USER:0 /var/solr && \
+    chown -R $SOLR_USER:0 /opt/solr && \
     yum clean all && \
     rm -rf /var/cache/yum && \
     cd / && \
     rm -rf /workspace
+
+COPY --chown=0:0 mnt /opt/mnt
 
 VOLUME /var/solr
 EXPOSE 8983
 WORKDIR /opt/solr
 USER $SOLR_USER
 
-CMD /opt/solr/bin/solr start -c -f
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["/opt/solr/bin/solr", "start", "-c", "-f"]

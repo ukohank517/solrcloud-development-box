@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema name="wikipedia" version="1.6">
+  <similarity class="solr.BM25SimilarityFactory">
+    <float name="k1">1.35</float>
+    <float name="b">0.6</float>
+  </similarity>
+
+  <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+  <fieldType name="int" class="solr.IntPointField" docValues="true"/>
+  <fieldType name="long" class="solr.LongPointField" docValues="true"/>
+  <fieldType name="text_ja" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="false">
+    <analyzer>
+      <tokenizer class="solr.JapaneseTokenizerFactory"/>
+      <filter class="solr.JapanesePartOfSpeechStopFilterFactory" tags="stoptags_ja.txt"/>
+      <filter class="solr.CJKWidthFilterFactory"/>
+      <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords_ja.txt"/>
+      <filter class="solr.JapaneseKatakanaStemFilterFactory" minimumLength="4"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+  </fieldType>
+
+  <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
+  <field name="_version_" type="long" indexed="true" stored="true"/>
+  <uniqueKey>id</uniqueKey>
+
+  <field name="revid" type="int" indexed="true" stored="true" docValues="true"/>
+  <field name="url" type="string" indexed="false" stored="false" docValues="true"/>
+  <field name="title" type="text_ja" indexed="true" stored="true"/>
+  <field name="text" type="text_ja" indexed="true" stored="true"/>
+</schema>

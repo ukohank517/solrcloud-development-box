@@ -13,6 +13,8 @@ services:
       - zoo1:2181
     depends_on:
       - zoo1
+    volumes:
+      - ./solr/mnt:/opt/mnt
 
   solr2:
     build: ./solr
@@ -27,6 +29,8 @@ services:
       - zoo1:2181
     depends_on:
       - zoo1
+    volumes:
+      - ./solr/mnt:/opt/mnt
 
   zoo1:
     image: zookeeper:3.6

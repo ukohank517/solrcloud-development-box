@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# Upload configset to SolrCloud
+
+set -u
+
+# usage
+function show_usage() {
+    echo -e "usage: $0\n \
+        -c configset name\n \
+        -z ZooKeeper host name" 1>&2
+    exit 1
+}
+
+CONFIGSET_NAME=
+
+# parse option
+while getopts ":c:z:" option; do
+    case $option in
+        c) CONFIGSET_NAME=$OPTARG ;;
+        z) ZK_HOST=$OPTARG ;;
+        *) show_usage ;;
+    esac
+done
+
+# validation
+if [ -z "$CONFIGSET_NAME" ]; then
+    show_usage
+fi
+
+if [ -z "$ZK_HOST" ]; then
+    show_usage
+fi
+
+# create config.zip and upload configset
+/opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost "$ZK_HOST" -cmd upconfig -confdir "/opt/solr/server/solr/configsets/$CONFIGSET_NAME/conf/" -confname "$CONFIGSET_NAME"
