@@ -1,43 +1,56 @@
-version: '3.8'
+version: "3.8"
 services:
-  solr1:
+  solr1: &solr
     build: ./solr
     ports:
-     - "8983:8983"
+     - 8983:8983
+     - 9854:9854
     command:
-      - solr
-      - start
-      - -f
+      - /bin/bash
       - -c
-      - -z
-      - zoo1:2181
+      - "solr start -c -z zoo:2181 && /opt/solr/contrib/prometheus-exporter/bin/solr-exporter -p 9854 -z zoo:2181"
     depends_on:
-      - zoo1
+      - zoo
     volumes:
       - ./solr/mnt:/opt/mnt
 
   solr2:
-    build: ./solr
+    <<: *solr
     ports:
-     - "8984:8983"
-    command:
-      - solr
-      - start
-      - -f
-      - -c
-      - -z
-      - zoo1:2181
-    depends_on:
-      - zoo1
+     - 8984:8983
+     - 9855:9854
     volumes:
       - ./solr/mnt:/opt/mnt
 
-  zoo1:
-    image: zookeeper:3.6
-    container_name: zoo1
-    hostname: zoo1
+  zoo:
+    image: zookeeper:3.7
     ports:
       - 2181:2181
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOO_4LW_COMMANDS_WHITELIST: mntr,conf,ruok
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/mnt/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/mnt/data:/prometheus
+    ports:
+      - 9090:9090
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+      - --storage.tsdb.retention.time=2d
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    env_file:
+      - grafana/grafana.env
+    volumes:
+      - ./grafana/mnt/data:/var/lib/grafana
+      - ./grafana/mnt/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/mnt/datasources:/etc/grafana/provisioning/datasources

@@ -13,7 +13,35 @@ Run:
 docker-compose up -d
 ```
 
+With build:
+
+```bash
+docker-compose up -d --build
+```
+
 and access `localhost:8983` or `localhost:8984`.
+
+### Upload configsets and create collection
+
+[Configsets of wikipedia collection](https://github.com/chlorochrule/solrcloud-development-box/tree/main/solr/mnt/solr/configsets/wikipedia/conf)
+can be uploaded by:
+
+```bash
+# upload configsets
+docker-compose exec solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost zoo:2181 -cmd upconfig -confdir /opt/mnt/solr/configsets/wikipedia/conf/ -confname wikipedia
+# create collection
+curl 'localhost:8983/solr/admin/collections?action=CREATE&name=wikipedia&numShards=2&replicationFactor=2&maxShardsPerNode=2&collection.configName=wikipedia'
+```
+
+### Prometheus
+
+Access: `localhost:9090`
+
+### Grafana
+
+1. Access`localhost:3000`
+2. Create Data sources of Prometheus (URL is `http://prometheus:9090`)
+3. Import [dashboard](https://github.com/apache/solr/blob/main/solr/contrib/prometheus-exporter/conf/grafana-solr-dashboard.json)
 
 ## Customize for your development
 
