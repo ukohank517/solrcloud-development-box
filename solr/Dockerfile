@@ -4,15 +4,14 @@ LABEL maintainer="Naoto Minami"
 LABEL repository="https://github.com/chlorochrule/solrcloud-development-box"
 
 ARG LUCENE_REPOSITORY="https://github.com/chlorochrule/lucene"
-ARG LUCENE_CHECKOUT="main"
+ARG LUCENE_CHECKOUT="branch_9x"
 
 ARG SOLR_REPOSITORY="https://github.com/chlorochrule/solr"
 ARG SOLR_CHECKOUT="SNAPSHOT"
 
 ARG SOLR_INSTALL_DIR="/opt/solr"
 
-ENV JAVA_HOME="/usr/lib/jvm/java-11-openjdk" \
-    SOLR_JETTY_HOST="0.0.0.0" \
+ENV SOLR_JETTY_HOST="0.0.0.0" \
     SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
@@ -27,13 +26,14 @@ ENV JAVA_HOME="/usr/lib/jvm/java-11-openjdk" \
 RUN set -ex && \
     groupadd -r --gid $SOLR_GID $SOLR_GROUP && \
     useradd -r --uid $SOLR_UID --gid $SOLR_GID $SOLR_USER && \
-    yum install which git java-11-openjdk java-11-openjdk-devel -y && \
+    yum install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm -y && \
+    yum install which git zulu17-jdk -y && \
     mkdir /workspace && \
     cd /workspace && \
     git clone $LUCENE_REPOSITORY lucene && \
     cd lucene && \
     git checkout $LUCENE_CHECKOUT && \
-    ./gradlew mavenToLocalRepo && \
+    ./gradlew mavenToLocal && \
     cd .. && \
     git clone $SOLR_REPOSITORY solr && \
     cd solr && \
@@ -46,7 +46,7 @@ RUN set -ex && \
     chown -R 0:0 $SOLR_INSTALL_DIR && \
     find $SOLR_INSTALL_DIR -type d -print0 | xargs -0 chmod 0755 && \
     find $SOLR_INSTALL_DIR -type f -print0 | xargs -0 chmod 0644 && \
-    chmod -R 0755 $SOLR_INSTALL_DIR/bin $SOLR_INSTALL_DIR/contrib/prometheus-exporter/bin/solr-exporter $SOLR_INSTALL_DIR/server/scripts/cloud-scripts && \
+    chmod -R 0755 $SOLR_INSTALL_DIR/bin $SOLR_INSTALL_DIR/prometheus-exporter/bin/solr-exporter $SOLR_INSTALL_DIR/server/scripts/cloud-scripts && \
     cp $SOLR_INSTALL_DIR/bin/solr.in.sh /etc/default/solr.in.sh && \
     chown 0:0 /etc/default/solr.in.sh && \
     chmod 0664 /etc/default/solr.in.sh && \

@@ -41,7 +41,7 @@ Access: `localhost:9090`
 
 1. Access`localhost:3000`
 2. Create Data sources of Prometheus (URL is `http://prometheus:9090`)
-3. Import [dashboard](https://github.com/apache/solr/blob/main/solr/contrib/prometheus-exporter/conf/grafana-solr-dashboard.json)
+3. Import [dashboard](https://github.com/apache/solr/blob/main/solr/prometheus-exporter/conf/grafana-solr-dashboard.json)
 
 ## Customize for your development
 
@@ -59,7 +59,7 @@ ARG SOLR_CHECKOUT="SNAPSHOT"  # Solr branch, commit or tag
 
 When referencing a particular Lucene branch, for example `main`, from Solr, Gradle build settings of Solr must be fix.
 
-1. Fix `gradle/defaults.gradle`.
+1. Fix `gradle/globals.gradle`.
 
 ```diff
 @@ -24,6 +24,7 @@ allprojects {
@@ -79,8 +79,8 @@ When referencing a particular Lucene branch, for example `main`, from Solr, Grad
  org.apache.james:apache-mime4j*=0.8.3
  org.apache.kerby:*=1.0.1
  org.apache.logging.log4j:*=2.13.2
--org.apache.lucene:*=9.0.0-prerelease5
-+org.apache.lucene:*=9.0.0-SNAPSHOT
+-org.apache.lucene:*=9.1.0
++org.apache.lucene:*=9.3.0-SNAPSHOT
  org.apache.opennlp:opennlp-tools=1.9.1
  org.apache.pdfbox:*=2.0.17
  org.apache.pdfbox:jempbox=1.8.16
