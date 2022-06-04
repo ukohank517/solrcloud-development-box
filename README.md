@@ -33,6 +33,37 @@ docker-compose exec solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhos
 curl 'localhost:8983/solr/admin/collections?action=CREATE&name=wikipedia&numShards=2&replicationFactor=2&maxShardsPerNode=2&collection.configName=wikipedia'
 ```
 
+### Feed documents
+
+Japanese wikipedia dataset is able to be got from [here](https://dumps.wikimedia.org/jawiki/). However, the dataset is formatted by complex XML.
+The dataset converted as feedable JSON is able to be got from [here](https://drive.google.com/file/d/1KbRqykxvNRPkEZrznObf6uvCR1YIXB3A/view?usp=sharing).
+
+NOTE: The original dataset of converted dataset is jawiki-20210601-pages-articles-multistream.xml.bz2
+
+1. Download [JSON dataset](https://drive.google.com/file/d/1KbRqykxvNRPkEZrznObf6uvCR1YIXB3A/view?usp=sharing)
+
+2. unzip dataset
+```bash
+du wikipedia_ja.zip
+# 2841736 wikipedia_ja.zip
+
+md5 wikipedia_ja.zip
+# MD5 (wikipedia_ja.zip) = f90b2dcf8e640fda7ac942c95136cd40
+
+unzip wikipedia_ja.zip
+```
+
+3. Feed using curl
+```bash
+# Feed all documents
+for docs in $(ls wikipedia_ja); do curl -X POST -H 'Content-Type: application/json' --data-binary @$docs 'http://localhost:8983/solr/wikipedia/update'; done
+```
+
+4. Check documents
+```bash
+curl 'localhost:8983/solr/wikipedia/select?q=*:*'
+```
+
 ### Prometheus
 
 Access: `localhost:9090`
