@@ -54,3 +54,8 @@ services:
       - ./grafana/mnt/data:/var/lib/grafana
       - ./grafana/mnt/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/mnt/datasources:/etc/grafana/provisioning/datasources
+
+  jmeter:
+    build: ./jmeter
+    volumes:
+      - ./jmeter/benchmarks:/var/jmeter/benchmarks

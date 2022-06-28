@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+import argparse
+import datetime
+import json
+import os
+import shutil
+import subprocess
+
+import jinja2
+import numpy as np
+import pandas as pd
+from kazoo.client import KazooClient
+
+parser = argparse.ArgumentParser(description='A python benchmark script for SolrCloud.')
+
+parser.add_argument('-c', '--collection', help='Solr collection name', required=True)
+parser.add_argument('-z', '--zk-hosts', help='ZooKeeper hosts name to get live nodes', required=True)
+parser.add_argument('-q', '--queries', help='Queries file', required=True)
+parser.add_argument('-t', '--throughput', type=int, help='Start throughput', required=True)
+parser.add_argument('--end-throughput', type=int, help='End throughput')
+parser.add_argument('-d', '--duration', type=int, help='Duration of the benchmark', required=True)
+parser.add_argument('--num-threads', type=int, default=100, help='Number of threads')
+parser.add_argument('--ramp-time', default=5, help='JMeter ramp-up time')
+parser.add_argument('--jfr-enabled', action='store_true', default=False, help='TODO: A flag JFR enabled or not')
+parser.add_argument('--extract-expression', action='append', help='TODO: A expression of JSONExtractor')
+parser.add_argument('--connect-timeout', default=1000, help='Connect timeout')
+parser.add_argument('--response-timeout', default=4000, help='Response timeout')
+parser.add_argument('--dir', default='/var/jmeter/benchmarks', help='Directory to save benchmark result')
+parser.add_argument('--clean', action='store_true', default=False, help='Clean up benchmark-solr directory')
+
+args = parser.parse_args()
+
+if args.clean:
+    shutil.rmtree(os.path.join(args.dir, 'benchmark-solr'))
+
+directory = os.path.join(args.dir,
+                         'benchmark-solr',
+                         f'{args.collection}_{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}')
+os.makedirs(directory)
+
+zk = KazooClient(args.zk_hosts)
+try:
+    zk.start()
+    state_json = json.loads(zk.get(f'/collections/{args.collection}/state.json')[0].decode('utf-8'))
+    zk.stop()
+finally:
+    zk.close()
+
+shards = state_json[args.collection]['shards']
+lines = []
+for shard in shards.values():
+    replicas = shard['replicas']
+    for replica in replicas.values():
+        if replica['state'] == 'active':
+            host_and_port = replica['base_url'].lstrip('http://').strip('/solr').split(':')
+            line = host_and_port[0] + ','
+            line += (host_and_port[1] if len(host_and_port) > 1 else '') + ','
+            line += replica['core']
+            lines.append(line)
+
+if len(lines) == 0:
+    raise RuntimeError("no active solr nodes")
+
+hosts_path = os.path.join(directory, 'hosts')
+with open(hosts_path, 'w') as f:
+    f.write('\n'.join(lines))
+
+params = {
+    'num_threads': args.num_threads,
+    'ramp_time': args.ramp_time,
+    'connect_timeout': args.connect_timeout,
+    'response_timeout': args.response_timeout,
+    'hosts_path': hosts_path,
+    'query_path': args.queries,
+    'start_throughput': args.throughput,
+    'end_throughput': args.end_throughput,
+    'duration': args.duration
+}
+
+env = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(os.path.realpath(__file__)), encoding='utf8'))
+template = env.get_template('solr.jmx')
+jmx = template.render(params)
+
+jmx_path = os.path.join(directory, 'benchmark.jmx')
+with open(jmx_path, 'w') as f:
+    f.write(jmx)
+
+jtl_path = os.path.join(directory, 'result.jtl')
+
+subprocess.run(['/opt/apache-jmeter-5.4.3/bin/jmeter', '-n', '-t', f'{jmx_path}', '-l',
+                f'{jtl_path}', '-j', f'{os.path.join(directory, "jmeter.log")}'])
+
+
+def percentile(p):
+    q = p / 100
+    f = lambda d: d.quantile(q)
+    f.__name__ = str(p) + '%ile'
+    return f
+
+
+result = pd.read_csv(jtl_path)
+target = result[result.columns[(result.dtypes == np.int64) | (result.dtypes == np.float64)]].drop(
+    ['timeStamp', 'responseCode', 'failureMessage', 'grpThreads', 'allThreads', 'IdleTime', 'Connect'], axis=1,
+    errors='ignore')[result['responseMessage'] == 'OK']
+
+report = target.agg(
+    ['min', percentile(50), percentile(75), percentile(95), percentile(99), percentile(99.9),
+     percentile(99.99), 'max', 'mean', 'std']).round(2)
+
+exec_time = (result['timeStamp'].max() - result['timeStamp'].min()) / 1000
+timeout_count = len(result[result['responseMessage'] == 'Non HTTP response message: Read timed out'])
+
+summary_report = '--- summary report ---\n'
+summary_report += 'num requests: ' + str(len(result)) + '\n'
+summary_report += 'execution time: ' + str(exec_time) + ' [sec]\n'
+summary_report += 'error (without timeout) count: ' + str(len(result) - len(target) - timeout_count) + '\n'
+summary_report += 'timeout count: ' + str(timeout_count) + '\n'
+summary_report += 'error (with timeout) rate: ' + str((len(result) - len(target)) / len(result)) + '\n'
+summary_report += 'throughput: ' + str(len(result) / exec_time) + ' [rps]\n'
+summary_report += str(report) + '\n'
+summary_report += '--- end report ---\n'
+
+print(summary_report)
+
+report.to_csv(os.path.join(directory, 'report.tsv'), sep='\t')
+
+with open(os.path.join(directory, 'report.txt'), 'w') as f:
+    f.write(summary_report)

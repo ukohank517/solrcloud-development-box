@@ -56,12 +56,57 @@ unzip wikipedia_ja.zip
 3. Feed using curl
 ```bash
 # Feed all documents
-for docs in $(ls wikipedia_ja); do curl -X POST -H 'Content-Type: application/json' --data-binary @$docs 'http://localhost:8983/solr/wikipedia/update'; done
+for docs in $(ls wikipedia_ja/*.json); do curl -X POST -H 'Content-Type: application/json' --data-binary @$docs 'http://localhost:8983/solr/wikipedia/update'; done
 ```
 
 4. Check documents
 ```bash
 curl 'localhost:8983/solr/wikipedia/select?q=*:*'
+```
+
+### Benchmark using JMeter
+
+1. Create `queries.txt` using luke handler
+```bash
+curl -fsSL 'localhost:8983/solr/wikipedia/admin/luke?show=all&numTerms=10000&fl=text' | jq -r .fields.text.topTerms | grep '"' | sed -e 's/[" ,]//g' > queries.txt
+```
+
+2. Convert to Solr query
+```bash
+mkdir -p jmeter/benchmarks
+python jmeter/scripts/create_wikipedia_queries.py queries.txt > jmeter/benchmarks/queries.txt
+```
+
+3. Run `benchmark-solr` script
+```bash
+docker-compose exec -u root jmeter benchmark-solr -c wikipedia -z zoo:2181 -q /var/jmeter/benchmarks/queries.txt -t 233 -d 60 --clean
+```
+
+4. See `report.txt`
+```bash
+cat jmeter/benchmarks/benchmark-solr/*/report.txt
+```
+`report.txt` example
+```
+--- summary report ---
+num requests: 6578
+execution time: 59.671 [sec]
+error (without timeout) count: 0
+timeout count: 0
+error (with timeout) rate: 0.0
+throughput: 110.23780395837174 [rps]
+           elapsed      bytes  sentBytes  Latency
+min           4.00     679.00     169.00     4.00
+50%ile       48.00   44198.00     186.00    47.00
+75%ile      180.00   62605.75     186.00   177.00
+95%ile      734.15  104636.80     204.00   728.15
+99%ile     1162.92  161320.78     222.00  1157.69
+99.9%ile   1557.27  272524.30     240.00  1557.27
+99.99%ile  1894.05  321512.07     258.00  1872.00
+max        1971.00  330710.00     258.00  1970.00
+mean        159.69   50264.35     186.80   157.57
+std         248.78   30548.91       9.68   247.28
+--- end report ---
 ```
 
 ### Prometheus
