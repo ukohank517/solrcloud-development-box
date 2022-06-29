@@ -78,7 +78,14 @@
             </collectionProp>
           </collectionProp>
         </kg.apc.jmeter.timers.VariableThroughputTimer>
-        <hashTree/>
+        <hashTree/>{% for extractor in extractors %}
+        <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="{{extractor.name}}" enabled="true">
+          <stringProp name="JSONPostProcessor.referenceNames">{{extractor.name}}</stringProp>
+          <stringProp name="JSONPostProcessor.jsonPathExprs">{{extractor.expr}}</stringProp>
+          <stringProp name="JSONPostProcessor.match_numbers"></stringProp>
+          <stringProp name="JSONPostProcessor.defaultValues">true</stringProp>
+        </JSONPostProcessor>
+        <hashTree/>{% endfor %}
       </hashTree>
     </hashTree>
   </hashTree>

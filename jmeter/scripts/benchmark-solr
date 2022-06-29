@@ -65,6 +65,11 @@ hosts_path = os.path.join(directory, 'hosts')
 with open(hosts_path, 'w') as f:
     f.write('\n'.join(lines))
 
+extractors = []
+if args.extract_expression is not None:
+    for expr in args.extract_expression:
+        extractors.append({'name': expr.split('.')[-1], 'expr': expr})
+
 params = {
     'num_threads': args.num_threads,
     'ramp_time': args.ramp_time,
@@ -74,7 +79,8 @@ params = {
     'query_path': args.queries,
     'start_throughput': args.throughput,
     'end_throughput': args.end_throughput,
-    'duration': args.duration
+    'duration': args.duration,
+    'extractors': extractors
 }
 
 env = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(os.path.realpath(__file__)), encoding='utf8'))
@@ -87,8 +93,11 @@ with open(jmx_path, 'w') as f:
 
 jtl_path = os.path.join(directory, 'result.jtl')
 
-subprocess.run(['/opt/apache-jmeter-5.4.3/bin/jmeter', '-n', '-t', f'{jmx_path}', '-l',
-                f'{jtl_path}', '-j', f'{os.path.join(directory, "jmeter.log")}'])
+jmeter_cmd = ['/opt/apache-jmeter-5.4.3/bin/jmeter', '-n', '-t', f'{jmx_path}', '-l', f'{jtl_path}', '-j',
+              f'{os.path.join(directory, "jmeter.log")}']
+if len(extractors) != 0:
+    jmeter_cmd.append(f'-Jsample_variables={",".join([e["name"] for e in extractors])}')
+subprocess.run(jmeter_cmd)
 
 
 def percentile(p):
