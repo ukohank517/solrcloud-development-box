@@ -3,8 +3,8 @@ services:
   solr1: &solr
     build: ./solr
     ports:
-     - 8983:8983
-     - 9854:9854
+      - 8983:8983
+      - 9854:9854
     command:
       - /bin/bash
       - -c
@@ -13,12 +13,14 @@ services:
       - zoo
     volumes:
       - ./solr/mnt:/opt/mnt
+    environment:
+      JAVA_OPTS: "${JAVA_OPTS} -XX:+FlightRecorder"
 
   solr2:
     <<: *solr
     ports:
-     - 8984:8983
-     - 9855:9854
+      - 8984:8983
+      - 9855:9854
     volumes:
       - ./solr/mnt:/opt/mnt
 
