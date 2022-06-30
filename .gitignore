@@ -1,3 +1,8 @@
 .idea
-**/mnt/data
+/grafana/mnt/data/
+/prometheus/mnt/data/
+/solr/mnt/solr1/
+/solr/mnt/solr2/
 /jmeter/benchmarks/
+/zookeeper/mnt/data/
+/zookeeper/mnt/datalog/

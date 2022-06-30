@@ -28,7 +28,7 @@ can be uploaded by:
 
 ```bash
 # upload configsets
-docker-compose exec solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost zoo:2181 -cmd upconfig -confdir /opt/mnt/solr/configsets/wikipedia/conf/ -confname wikipedia
+docker-compose exec solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost zoo:2181 -cmd upconfig -confdir /opt/solr/server/solr/configsets/wikipedia/conf -confname wikipedia
 # create collection
 curl 'localhost:8983/solr/admin/collections?action=CREATE&name=wikipedia&numShards=2&replicationFactor=2&maxShardsPerNode=2&collection.configName=wikipedia'
 ```
@@ -56,7 +56,7 @@ unzip wikipedia_ja.zip
 3. Feed using curl
 ```bash
 # Feed all documents
-for docs in $(ls wikipedia_ja/*.json); do curl -X POST -H 'Content-Type: application/json' --data-binary @$docs 'http://localhost:8983/solr/wikipedia/update'; done
+for docs in $(ls wikipedia_ja/*.json); do curl -X POST -H 'Content-Type: application/json' --data-binary @$docs 'http://localhost:8983/solr/wikipedia/update?commit=true'; done
 ```
 
 4. Check documents
@@ -68,18 +68,19 @@ curl 'localhost:8983/solr/wikipedia/select?q=*:*'
 
 1. Create `queries.txt` using luke handler
 ```bash
-curl -fsSL 'localhost:8983/solr/wikipedia/admin/luke?show=all&numTerms=10000&fl=text' | jq -r .fields.text.topTerms | grep '"' | sed -e 's/[" ,]//g' > queries.txt
+curl -fsSL 'localhost:8983/solr/wikipedia/admin/luke?show=all&numTerms=10000&fl=text' | jq -r .fields.text.topTerms | grep '"' | sed -e 's/[" ,]//g' > queries_tmp.txt
 ```
 
 2. Convert to Solr query
 ```bash
 mkdir -p jmeter/benchmarks
-python jmeter/scripts/create_wikipedia_queries.py queries.txt > jmeter/benchmarks/queries.txt
+jmeter/bin/create_wikipedia_queries.py queries_tmp.txt > jmeter/benchmarks/queries.txt
+rm queries_tmp.txt
 ```
 
 3. Run `benchmark-solr` script
 ```bash
-docker-compose exec -u root jmeter benchmark-solr -c wikipedia -z zoo:2181 -q /var/jmeter/benchmarks/queries.txt -t 233 -d 60 --clean
+docker-compose exec -u root jmeter benchmark-solr -c wikipedia -z zoo:2181 -q /var/jmeter/benchmarks/queries.txt -t 233 -d 60 --extract-expression '$.response.numFound' --extract-expression '$.responseHeader.QTime' --clean
 ```
 
 4. See `report.txt`
@@ -107,6 +108,19 @@ max        1971.00  330710.00     258.00  1970.00
 mean        159.69   50264.35     186.80   157.57
 std         248.78   30548.91       9.68   247.28
 --- end report ---
+```
+
+#### Java Flight Recorder during benchmarking
+```bash
+docker-compose exec -u solr solr1 start-jfr.sh 60  # 60sec
+ls solr/mnt/solr1/benchmarks/solr.jfr
+```
+
+### Graceful Shutdown
+```bash
+docker-compose exec -u solr solr1 solr stop -all
+docker-compose exec -u solr solr2 solr stop -all
+docker-compose down
 ```
 
 ### Prometheus

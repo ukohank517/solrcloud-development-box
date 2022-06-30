@@ -16,7 +16,7 @@ ENV SOLR_JETTY_HOST="0.0.0.0" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
-    PATH="$SOLR_INSTALL_DIR/bin:/opt/mnt/bin:$PATH" \
+    PATH="$SOLR_INSTALL_DIR/bin:$PATH" \
     SOLR_INCLUDE="/etc/default/solr.in.sh" \
     SOLR_HOME="/var/solr/data" \
     SOLR_PID_DIR="/var/solr" \
@@ -50,17 +50,18 @@ RUN set -ex && \
     cp $SOLR_INSTALL_DIR/bin/solr.in.sh /etc/default/solr.in.sh && \
     chown 0:0 /etc/default/solr.in.sh && \
     chmod 0664 /etc/default/solr.in.sh && \
-    mkdir -p $SOLR_HOME $SOLR_LOGS_DIR /opt/mnt/bin && \
+    mkdir -p $SOLR_HOME $SOLR_LOGS_DIR && \
     cp $SOLR_INSTALL_DIR/server/solr/solr.xml $SOLR_INSTALL_DIR/server/solr/zoo.cfg $SOLR_HOME && \
     cp $SOLR_INSTALL_DIR/server/resources/log4j2.xml $LOG4J_PROPS && \
-    chown -R $SOLR_USER:0 /var/solr && \
-    chown -R $SOLR_USER:0 $SOLR_INSTALL_DIR && \
+    chown -R $SOLR_USER:$SOLR_GROUP /var/solr && \
+    chown -R $SOLR_USER:$SOLR_GROUP $SOLR_INSTALL_DIR && \
     yum clean all && \
     rm -rf /var/cache/yum && \
     cd / && \
     rm -rf /workspace
 
-COPY --chown=0:0 mnt /opt/mnt
+COPY --chown=$SOLR_USER:$SOLR_GROUP bin/docker-entrypoint.sh $SOLR_INSTALL_DIR/bin/docker-entrypoint.sh
+COPY --chown=$SOLR_USER:$SOLR_GROUP bin/start-jfr.sh $SOLR_INSTALL_DIR/bin/start-jfr.sh
 
 VOLUME /var/solr
 EXPOSE 8983

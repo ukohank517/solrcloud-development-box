@@ -12,9 +12,12 @@ services:
     depends_on:
       - zoo
     volumes:
-      - ./solr/mnt:/opt/mnt
+      - ./solr/mnt/configsets/wikipedia:/opt/solr/server/solr/configsets/wikipedia
+      - ./solr/mnt/solr1/data:/var/solr/data
+      - ./solr/mnt/solr1/logs:/var/solr/logs
+      - ./solr/mnt/solr1/benchmarks:/var/solr/benchmarks
     environment:
-      JAVA_OPTS: "${JAVA_OPTS} -XX:+FlightRecorder"
+      SOLR_OPTS: "-XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=256"
 
   solr2:
     <<: *solr
@@ -22,12 +25,18 @@ services:
       - 8984:8983
       - 9855:9854
     volumes:
-      - ./solr/mnt:/opt/mnt
+      - ./solr/mnt/configsets/wikipedia:/opt/solr/server/solr/configsets/wikipedia
+      - ./solr/mnt/solr2/data:/var/solr/data
+      - ./solr/mnt/solr2/logs:/var/solr/logs
+      - ./solr/mnt/solr2/benchmarks:/var/solr/benchmarks
 
   zoo:
     image: zookeeper:3.7
     ports:
       - 2181:2181
+    volumes:
+      - ./zookeeper/mnt/data:/data
+      - ./zookeeper/mnt/datalog:/datalog
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOO_4LW_COMMANDS_WHITELIST: mntr,conf,ruok

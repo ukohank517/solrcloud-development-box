@@ -25,7 +25,7 @@ RUN set -ex && \
 
 WORKDIR	"${JMETER_HOME}"
 
-COPY --chown=0:0 --chmod=755 scripts/benchmark-solr /usr/local/bin/benchmark-solr
-COPY --chown=0:0 --chmod=644 scripts/solr.jmx /usr/local/bin/solr.jmx
+COPY --chown=0:0 --chmod=755 bin/benchmark-solr /usr/local/bin/benchmark-solr
+COPY --chown=0:0 --chmod=644 bin/solr.jmx /usr/local/bin/solr.jmx
 
 CMD ["tail","-f", "/dev/null"]
