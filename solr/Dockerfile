@@ -3,11 +3,7 @@ FROM centos:7
 LABEL maintainer="Naoto Minami"
 LABEL repository="https://github.com/chlorochrule/solrcloud-development-box"
 
-ARG LUCENE_REPOSITORY="https://github.com/chlorochrule/lucene"
-ARG LUCENE_CHECKOUT="branch_9x"
-
-ARG SOLR_REPOSITORY="https://github.com/chlorochrule/solr"
-ARG SOLR_CHECKOUT="SNAPSHOT"
+ARG SOLR_REPOSITORY="https://github.com/apache/solr"
 
 ARG SOLR_INSTALL_DIR="/opt/solr"
 
@@ -30,14 +26,16 @@ RUN set -ex && \
     yum install which git zulu17-jdk -y && \
     mkdir /workspace && \
     cd /workspace && \
-    git clone $LUCENE_REPOSITORY lucene && \
-    cd lucene && \
-    git checkout $LUCENE_CHECKOUT && \
-    ./gradlew mavenToLocal && \
-    cd .. && \
+    if [ -n "$LUCENE_REPOSITORY" ]; then \
+        git clone $LUCENE_REPOSITORY lucene && \
+        cd lucene && \
+        git checkout ${LUCENE_CHECKOUT:-main} && \
+        ./gradlew mavenToLocal && \
+        cd ..; \
+    fi && \
     git clone $SOLR_REPOSITORY solr && \
     cd solr && \
-    git checkout $SOLR_CHECKOUT && \
+    git checkout ${SOLR_CHECKOUT-main} && \
     ./gradlew assemble && \
     ./gradlew dev && \
     mkdir -p $SOLR_INSTALL_DIR && \
