@@ -18,7 +18,7 @@ RUN set -ex && \
     mkdir -p /opt && \
     tar xzvf "/workspace/apache-jmeter-${JMETER_VERSION}.tgz" -C /opt && \
     curl -fsSL -o "${JMETER_HOME}/lib/ext/jmeter-plugins-manager.jar" "https://jmeter-plugins.org/get/" && \
-    curl -fsSL -o "${JMETER_HOME}/lib/cmdrunner-2.2.jar" "http://search.maven.org/remotecontent?filepath=kg/apc/cmdrunner/2.2/cmdrunner-2.2.jar" && \
+    curl -fsSL -o "${JMETER_HOME}/lib/cmdrunner-2.3.jar" "http://search.maven.org/remotecontent?filepath=kg/apc/cmdrunner/2.3/cmdrunner-2.3.jar" && \
     java -cp "${JMETER_HOME}/lib/ext/jmeter-plugins-manager.jar" org.jmeterplugins.repository.PluginManagerCMDInstaller && \
     ${JMETER_HOME}/bin/PluginsManagerCMD.sh install "jpgc-tst=2.5" && \
     rm -rf /workspace
