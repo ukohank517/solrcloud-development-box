@@ -23,7 +23,7 @@ and access `localhost:8983` or `localhost:8984`.
 
 ### Upload configsets and create collection
 
-[Configsets of wikipedia collection](https://github.com/chlorochrule/solrcloud-development-box/tree/main/solr/mnt/solr/configsets/wikipedia/conf)
+[Configsets of wikipedia collection](https://github.com/chlorochrule/solrcloud-development-box/tree/main/solr/mnt/configsets/wikipedia/conf)
 can be uploaded by:
 
 ```bash

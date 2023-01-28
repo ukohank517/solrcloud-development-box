@@ -5,6 +5,7 @@ services:
     ports:
       - 8983:8983
       - 9854:9854
+      - 5005:5005
     command:
       - /bin/bash
       - -c
@@ -17,18 +18,25 @@ services:
       - ./solr/mnt/solr1/logs:/var/solr/logs
       - ./solr/mnt/solr1/benchmarks:/var/solr/benchmarks
     environment:
-      SOLR_OPTS: "-XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=256"
+      SOLR_HOST: solr1
+      SOLR_OPTS: "-XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=256 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      SOLR_MODULES: "ltr"
 
   solr2:
     <<: *solr
     ports:
       - 8984:8983
       - 9855:9854
+      - 5006:5005
     volumes:
       - ./solr/mnt/configsets/wikipedia:/opt/solr/server/solr/configsets/wikipedia
       - ./solr/mnt/solr2/data:/var/solr/data
       - ./solr/mnt/solr2/logs:/var/solr/logs
       - ./solr/mnt/solr2/benchmarks:/var/solr/benchmarks
+    environment:
+      SOLR_HOST: solr2
+      SOLR_OPTS: "-XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=256 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      SOLR_MODULES: "ltr"
 
   zoo:
     image: zookeeper:3.7

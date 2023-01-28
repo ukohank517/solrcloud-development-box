@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
-  <luceneMatchVersion>9.0.0</luceneMatchVersion>
+  <luceneMatchVersion>9.4</luceneMatchVersion>
+
+  <lib dir="${solr.install.dir:../../../..}/modules/ltr/lib/" regex=".*\.jar"/>
 
   <dataDir>${solr.data.dir:}</dataDir>
 
@@ -47,16 +49,16 @@
   <query>
     <maxBooleanClauses>${solr.max.booleanClauses:1024}</maxBooleanClauses>
 
-    <filterCache size="512"
-                 initialSize="512"
+    <filterCache size="0"
+                 initialSize="0"
                  autowarmCount="0"/>
 
-    <queryResultCache size="512"
-                      initialSize="512"
+    <queryResultCache size="0"
+                      initialSize="0"
                       autowarmCount="0"/>
 
-    <documentCache size="512"
-                   initialSize="512"
+    <documentCache size="0"
+                   initialSize="0"
                    autowarmCount="0"/>
 
     <enableLazyFieldLoading>true</enableLazyFieldLoading>
@@ -104,4 +106,17 @@
     <processor class="solr.DistributedUpdateProcessorFactory"/>
     <processor class="solr.RunUpdateProcessorFactory"/>
   </updateRequestProcessorChain>
+
+  <!-- LTR -->
+  <queryParser name="ltr" class="org.apache.solr.ltr.search.LTRQParserPlugin"/>
+  <cache name="QUERY_DOC_FV"
+         class="solr.search.CaffeineCache"
+         size="4096"
+         initialSize="2048"
+         autowarmCount="4096"
+         regenerator="solr.search.NoOpRegenerator"/>
+  <transformer name="features" class="org.apache.solr.ltr.response.transform.LTRFeatureLoggerTransformerFactory">
+    <str name="fvCacheName">QUERY_DOC_FV</str>
+  </transformer>
+  <transformer name="interleaving" class="org.apache.solr.ltr.response.transform.LTRInterleavingTransformerFactory"/>
 </config>
