@@ -4,12 +4,11 @@ services:
     build: ./solr
     ports:
       - 8983:8983
-      - 9854:9854
       - 5005:5005
     command:
       - /bin/bash
       - -c
-      - "solr start -c -z zoo:2181 && /opt/solr/prometheus-exporter/bin/solr-exporter -p 9854 -z zoo:2181"
+      - "solr start -f -c -z zoo:2181"
     depends_on:
       - zoo
     volumes:
@@ -26,7 +25,6 @@ services:
     <<: *solr
     ports:
       - 8984:8983
-      - 9855:9854
       - 5006:5005
     volumes:
       - ./solr/mnt/configsets/wikipedia:/opt/solr/server/solr/configsets/wikipedia
@@ -37,6 +35,18 @@ services:
       SOLR_HOST: solr2
       SOLR_OPTS: "-XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=256 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       SOLR_MODULES: "ltr"
+
+  solr-exporter:
+    build: ./solr
+    ports:
+      - 9854:9854
+    depends_on:
+      - solr1
+      - solr2
+    command:
+      - /bin/bash
+      - -c
+      - "/opt/solr/prometheus-exporter/bin/solr-exporter -p 9854 -z zoo:2181"
 
   zoo:
     image: zookeeper:3.7

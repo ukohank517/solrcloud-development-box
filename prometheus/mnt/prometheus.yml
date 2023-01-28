@@ -9,4 +9,4 @@ scrape_configs:
 
   - job_name: 'solr'
     static_configs:
-      - targets: ['solr1:9854', 'solr2:9854']
+      - targets: ['solr-exporter:9854']
