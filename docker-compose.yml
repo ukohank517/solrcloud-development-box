@@ -47,6 +47,8 @@ services:
       - /bin/bash
       - -c
       - "/opt/solr/prometheus-exporter/bin/solr-exporter -p 9854 -z zoo:2181"
+    volumes:
+      - ./solr/mnt/conf/solr-exporter-config.xml:/opt/solr/prometheus-exporter/conf/solr-exporter-config.xml
 
   zoo:
     image: zookeeper:3.7
