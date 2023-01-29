@@ -12,7 +12,7 @@ services:
     depends_on:
       - zoo
     volumes:
-      - ./solr/mnt/configsets/wikipedia:/opt/solr/server/solr/configsets/wikipedia
+      - ./solr/configsets:/opt/solr/configsets
       - ./solr/mnt/solr1/data:/var/solr/data
       - ./solr/mnt/solr1/logs:/var/solr/logs
       - ./solr/mnt/solr1/benchmarks:/var/solr/benchmarks
@@ -27,7 +27,7 @@ services:
       - 8984:8983
       - 5006:5005
     volumes:
-      - ./solr/mnt/configsets/wikipedia:/opt/solr/server/solr/configsets/wikipedia
+      - ./solr/configsets:/opt/solr/configsets
       - ./solr/mnt/solr2/data:/var/solr/data
       - ./solr/mnt/solr2/logs:/var/solr/logs
       - ./solr/mnt/solr2/benchmarks:/var/solr/benchmarks
@@ -48,7 +48,7 @@ services:
       - -c
       - "/opt/solr/prometheus-exporter/bin/solr-exporter -p 9854 -z zoo:2181"
     volumes:
-      - ./solr/mnt/conf/solr-exporter-config.xml:/opt/solr/prometheus-exporter/conf/solr-exporter-config.xml
+      - ./solr/solr-exporter-config.xml:/opt/solr/prometheus-exporter/conf/solr-exporter-config.xml
 
   zoo:
     image: zookeeper:3.7
@@ -64,7 +64,7 @@ services:
   prometheus:
     image: prom/prometheus
     volumes:
-      - ./prometheus/mnt/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus/mnt/data:/prometheus
     ports:
       - 9090:9090

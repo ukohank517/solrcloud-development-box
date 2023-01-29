@@ -23,12 +23,12 @@ and access `localhost:8983` or `localhost:8984`.
 
 ### Upload configsets and create collection
 
-[Configsets of wikipedia collection](https://github.com/chlorochrule/solrcloud-development-box/tree/main/solr/mnt/configsets/wikipedia/conf)
+[Configsets of wikipedia collection](https://github.com/chlorochrule/solrcloud-development-box/tree/main/solr/configsets/wikipedia)
 can be uploaded by:
 
 ```bash
 # upload configsets
-docker-compose exec solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost zoo:2181 -cmd upconfig -confdir /opt/solr/server/solr/configsets/wikipedia/conf -confname wikipedia
+docker-compose exec solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost zoo:2181 -cmd upconfig -confdir /opt/solr/configsets/wikipedia -confname wikipedia
 # create collection
 curl 'localhost:8983/solr/admin/collections?action=CREATE&name=wikipedia&numShards=2&replicationFactor=2&maxShardsPerNode=2&collection.configName=wikipedia'
 ```
