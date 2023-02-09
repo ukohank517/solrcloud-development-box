@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<schema name="wikipedia" version="1.6">
+<schema name="amazonshopping" version="1.6">
   <similarity class="solr.BM25SimilarityFactory">
     <float name="k1">1.35</float>
     <float name="b">0.6</float>
@@ -20,12 +20,21 @@
     </analyzer>
   </fieldType>
 
-  <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+  <field name="example_id" type="string" indexed="true" stored="true" required="true"
+    multiValued="false" />
   <field name="_version_" type="long" indexed="true" stored="true" />
-  <uniqueKey>id</uniqueKey>
-
-  <field name="revid" type="int" indexed="true" stored="true" docValues="true" />
-  <field name="url" type="string" indexed="false" stored="false" docValues="true" />
-  <field name="title" type="text_ja" indexed="true" stored="true" />
-  <field name="text" type="text_ja" indexed="true" stored="true" />
+  <field name="query" type="text_ja" indexed="true" stored="true" />
+  <field name="query_id" type="int" indexed="true" stored="true" docValues="true" />
+  <field name="product_id" type="string" indexed="true" stored="true" docValues="true" />
+  <field name="product_locale" type="string" indexed="true" stored="true" docValues="true" />
+  <field name="esci_label" type="string" indexed="true" stored="true" docValues="true" />
+  <field name="small_version" type="int" indexed="true" stored="true" docValues="true" />
+  <field name="large_version" type="int" indexed="true" stored="true" docValues="true" />
+  <field name="split" type="string" indexed="true" stored="true" docValues="true" />
+  <field name="product_title" type="text_ja" indexed="true" stored="true" />
+  <field name="product_description" type="text_ja" indexed="true" stored="true" />
+  <field name="product_bullet_point" type="text_ja" indexed="true" stored="true" />
+  <field name="product_brand" type="text_ja" indexed="true" stored="true" />
+  <field name="product_color" type="text_ja" indexed="true" stored="true" />
+  <uniqueKey>example_id</uniqueKey>
 </schema>

@@ -4,7 +4,7 @@ import os
 
 SPLIT_SIZE=10000
 INPUT_FOLDER='esci-data/shopping_queries_dataset'
-OUTPUT_FOLDER='split-json-data'
+OUTPUT_FOLDER='amazonshopping'
 
 
 print("reading data file ...")
