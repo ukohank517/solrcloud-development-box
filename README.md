@@ -5,84 +5,84 @@
 Development environment for SolrCloud using Docker and Docker compose.
 This repository provides customized build for any lucene commit and solr commit.
 
-## How to use
+## How to use: create solr system
+
+### prepare json data
+
+Amazon Shopping Queries Dataset is able to be got from [here](https://github.com/amazon-science/esci-data).
+
+This dataset is included as a submodule in this repository.
+
+You can prepare json data by the following steps:
+
+1. take the data from github, this step may take a long time
+
+    ```bash
+    git submodule update --init --recursive
+    ```
+
+2. generate dataset
+    ```bash
+    cd data
+    python3 create_shopping_data.py
+    cd ..
+    ```
+
+then you can check you json data in folder data/amazonshopping
+
+### launch dolr cloud
 
 Run:
-
-```bash
-docker-compose up -d
-```
-
-With build:
 
 ```bash
 docker-compose up -d --build
 ```
 
-and access `localhost:8983` or `localhost:8984`.
+You can see the solr system by accessing `localhost:8983` or `localhost:8984`.
+
+The pull down menu 「Collection Selector」is empty now.
 
 ### Upload configsets and create collection
 
-[Configsets of wikipedia collection](https://github.com/chlorochrule/solrcloud-development-box/tree/main/solr/configsets/wikipedia)
-can be uploaded by:
+Configsets of amazon shopping data collection can be uploaded by:
 
 ```bash
 # upload configsets
-docker-compose exec solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost zoo:2181 -cmd upconfig -confdir /opt/solr/configsets/wikipedia -confname wikipedia
+docker-compose exec solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost zoo:2181 -cmd upconfig -confdir /opt/solr/configsets/amazonshopping -confname amazonshopping
 # create collection
-curl 'localhost:8983/solr/admin/collections?action=CREATE&name=wikipedia&numShards=2&replicationFactor=2&maxShardsPerNode=2&collection.configName=wikipedia'
+curl 'localhost:8983/solr/admin/collections?action=CREATE&name=amazonshopping&numShards=2&replicationFactor=2&maxShardsPerNode=2&collection.configName=amazonshopping'
 ```
 
+The file `solr/configsets/amazonshopping` is created base to the json file in `data/amazonshopping/**.json`,
+
+The `field` defines every fields in json file, with the primary key named `example_id`.
+
+Now, access to `localohst:8983`, you can find the `amazonshopping` included in the pull down menu 「Collection Selector」.
+
+※ Here, you can find solr API [here](https://solr.apache.org/guide/7_1/coreadmin-api.html#coreadmin-create).
 ### Feed documents
 
-Amazon Shopping Queries Dataset is able to be got fom [here](https://github.com/amazon-science/esci-data).
-
-This data is included as a submodule in this repository.
-
-1. take the data sample from github
-
-```bash
-git submodule update --init --recursive
-```
-
-2. generate dataset
-```bash
-cd data/esci-data
-git lfs pull
-cd ..
-python3 split.py
-```
-
-
-
-3. Feed using curl
+The json file prepared before can be fee by curl command:
 ```bash
 # Feed all documents
-for docs in $(ls wikipedia_ja/*.json); do curl -X POST -H 'Content-Type: application/json' --data-binary @$docs 'http://localhost:8983/solr/wikipedia/update?commit=true'; done
+for docs in $(ls ./data/amazonshopping/*.json); do curl -X POST -H 'Content-Type: application/json' --data-binary @$docs 'http://localhost:8983/solr/amazonshopping/update?commit=true'; done
 ```
 
-4. Check documents
-```bash
-curl 'localhost:8983/solr/wikipedia/select?q=*:*'
-```
+Access to `http://localhost:8983/solr/#/amazonshopping/query`, press `Execute Query` button and you can randomly get 10 json data.
 
-### Benchmark using JMeter
+## How to use: Benchmark using JMeter
 
-1. Create `queries.txt` using luke handler
-```bash
-curl -fsSL 'localhost:8983/solr/wikipedia/admin/luke?show=all&numTerms=10000&fl=text' | jq -r .fields.text.topTerms | grep '"' | sed -e 's/[" ,]//g' > queries_tmp.txt
-```
-
-2. Convert to Solr query
+1. Create Solr query
 ```bash
 mkdir -p jmeter/benchmarks
-jmeter/bin/create_wikipedia_queries.py queries_tmp.txt > jmeter/benchmarks/queries.txt
-rm queries_tmp.txt
+cd data
+python3 create_shopping_query.py > ../jmeter/benchmarks/queries.txt
+cd ..
 ```
 
 3. Run `benchmark-solr` script
 ```bash
-docker-compose exec -u root jmeter benchmark-solr -c wikipedia -z zoo:2181 -q /var/jmeter/benchmarks/queries.txt -t 233 -d 60 --extract-expression '$.response.numFound' --extract-expression '$.responseHeader.QTime' --clean
+docker-compose exec -u root jmeter benchmark-solr -c amazonshopping -z zoo:2181 -q /var/jmeter/benchmarks/queries.txt -t 233 -d 60 --extract-expression '$.response.numFound' --extract-expression '$.responseHeader.QTime' --clean
 ```
 
 4. See `report.txt`
