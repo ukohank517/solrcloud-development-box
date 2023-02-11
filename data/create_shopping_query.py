@@ -18,4 +18,4 @@ df_examples_products = pd.merge(
 
 queries = df_examples_products[['query']].drop_duplicates().sample(10000).reset_index(drop=True)
 for q in queries['query']:
-    print('/select?q=text:' + urllib.parse.quote(q))
+    print('/select?q=query:' + urllib.parse.quote(q))

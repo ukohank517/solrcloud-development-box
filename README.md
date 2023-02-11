@@ -75,6 +75,7 @@ Access to `http://localhost:8983/solr/#/amazonshopping/query`, press `Execute Qu
 1. Create Solr query
 ```bash
 mkdir -p jmeter/benchmarks
+mkdir -p jmeter/benchmarks/benchmark-solr
 cd data
 python3 create_shopping_query.py > ../jmeter/benchmarks/queries.txt
 cd ..
