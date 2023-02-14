@@ -51,7 +51,7 @@ for shard in shards.values():
     replicas = shard['replicas']
     for replica in replicas.values():
         if replica['state'] == 'active':
-            host_and_port = replica['base_url'].lstrip('http://').strip('/solr').split(':')
+            host_and_port = replica['base_url'].lstrip('http://').rstrip('/solr').split(':')
             line = host_and_port[0] + ','
             line += (host_and_port[1] if len(host_and_port) > 1 else '') + ','
             line += replica['core']
