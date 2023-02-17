@@ -5,7 +5,7 @@
 Development environment for SolrCloud using Docker and Docker compose.
 This repository provides customized build for any lucene commit and solr commit.
 
-## How to use: create solr system
+## How to use: Setup SolrCloud
 
 ### prepare json data
 
@@ -30,7 +30,7 @@ You can prepare json data by the following steps:
 
 then you can check you json data in folder data/amazonshopping
 
-### launch dolr cloud
+### Launch SolrCloud
 
 Run:
 
@@ -40,7 +40,7 @@ docker-compose up -d --build
 
 You can see the solr system by accessing `localhost:8983` or `localhost:8984`.
 
-The pull down menu 「Collection Selector」is empty now.
+The pull down menu "Collection Selector" is empty now.
 
 ### Upload configsets and create collection
 
@@ -57,12 +57,12 @@ The file `solr/configsets/amazonshopping` is created base to the json file in `d
 
 The `field` defines every fields in json file, with the primary key named `example_id`.
 
-Now, access to `localohst:8983`, you can find the `amazonshopping` included in the pull down menu 「Collection Selector」.
+Now, access to `localohst:8983`, you can find the `amazonshopping` included in the pull down menu "Collection Selector".
 
-※ Here, you can find solr API [here](https://solr.apache.org/guide/7_1/coreadmin-api.html#coreadmin-create).
+※ You can find Solr API [here](https://solr.apache.org/guide/solr/latest/configuration-guide/coreadmin-api.html#coreadmin-create)
 ### Feed documents
 
-The json file prepared before can be fee by curl command:
+The json file prepared before can be feed by curl command:
 ```bash
 # Feed all documents
 for docs in $(ls ./data/amazonshopping/*.json); do curl -X POST -H 'Content-Type: application/json' --data-binary @$docs 'http://localhost:8983/solr/amazonshopping/update?commit=true'; done

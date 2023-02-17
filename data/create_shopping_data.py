@@ -21,11 +21,7 @@ df_examples_products = pd.merge(
     right_on=['product_locale', 'product_id']
 )
 
-try:
-    os.mkdir(OUTPUT_FOLDER)
-except FileExistsError:
-    pass
-
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 for i in range(0, len(df_examples_products), SPLIT_SIZE):
     data_from = i
