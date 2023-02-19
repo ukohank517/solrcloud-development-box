@@ -1,0 +1,3 @@
+[submodule "data/esci-data"]
+	path = data/esci-data
+	url = git@github.com:amazon-science/esci-data.git

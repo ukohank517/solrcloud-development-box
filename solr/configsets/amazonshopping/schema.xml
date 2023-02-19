@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema name="amazonshopping" version="1.6">
+  <similarity class="solr.BM25SimilarityFactory">
+    <float name="k1">1.35</float>
+    <float name="b">0.6</float>
+  </similarity>
+
+  <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true" />
+  <fieldType name="int" class="solr.IntPointField" docValues="true" />
+  <fieldType name="long" class="solr.LongPointField" docValues="true" />
+  <fieldType name="text_ja" class="solr.TextField" positionIncrementGap="100"
+    autoGeneratePhraseQueries="false">
+    <analyzer>
+      <tokenizer class="solr.JapaneseTokenizerFactory" />
+      <filter class="solr.JapanesePartOfSpeechStopFilterFactory" tags="stoptags_ja.txt" />
+      <filter class="solr.CJKWidthFilterFactory" />
+      <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords_ja.txt" />
+      <filter class="solr.JapaneseKatakanaStemFilterFactory" minimumLength="4" />
+      <filter class="solr.LowerCaseFilterFactory" />
+    </analyzer>
+  </fieldType>
+
+  <field name="example_id" type="string" indexed="true" stored="true" required="true"
+    multiValued="false" />
+  <field name="_version_" type="long" indexed="true" stored="true" />
+  <field name="query" type="text_ja" indexed="true" stored="true" />
+  <field name="query_id" type="int" indexed="true" stored="true" docValues="true" />
+  <field name="product_id" type="string" indexed="true" stored="true" docValues="true" />
+  <field name="product_locale" type="string" indexed="true" stored="true" docValues="true" />
+  <field name="esci_label" type="string" indexed="true" stored="true" docValues="true" />
+  <field name="small_version" type="int" indexed="true" stored="true" docValues="true" />
+  <field name="large_version" type="int" indexed="true" stored="true" docValues="true" />
+  <field name="split" type="string" indexed="true" stored="true" docValues="true" />
+  <field name="product_title" type="text_ja" indexed="true" stored="true" />
+  <field name="product_description" type="text_ja" indexed="true" stored="true" />
+  <field name="product_bullet_point" type="text_ja" indexed="true" stored="true" />
+  <field name="product_brand" type="text_ja" indexed="true" stored="true" />
+  <field name="product_color" type="text_ja" indexed="true" stored="true" />
+  <uniqueKey>example_id</uniqueKey>
+</schema>
