@@ -1,0 +1,11 @@
+name: check_script
+jobs:
+  script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build:
+        run: |
+          cd data
+          python3 create_shopping_data.py
+          ls -al
