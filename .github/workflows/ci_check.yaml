@@ -14,5 +14,5 @@ jobs:
         run: |
           cd data
           ls -la esci-data
-          # pip3 install -r requirement.txt
-          # python3 create_shopping_data.py
+          pip3 install -r requirement.txt
+          python3 create_shopping_data.py
