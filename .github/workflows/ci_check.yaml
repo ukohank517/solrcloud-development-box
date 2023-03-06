@@ -4,7 +4,7 @@ on:
     branches:
       - main
 jobs:
-  script:
+  ci_check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
