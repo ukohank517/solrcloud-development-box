@@ -3,7 +3,6 @@ on:
   pull_request:
     branches:
       - main
-      - "feature/**"
 jobs:
   script:
     runs-on: ubuntu-latest
