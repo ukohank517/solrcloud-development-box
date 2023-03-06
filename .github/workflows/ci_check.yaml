@@ -1,4 +1,7 @@
 name: check_script
+on:
+  pull_request:
+    types: [opened]
 jobs:
   script:
     runs-on: ubuntu-latest
