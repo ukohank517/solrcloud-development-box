@@ -8,9 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - name: build
         run: |
           cd data
+          ls -la
           pip3 install -r requirement.txt
           python3 create_shopping_data.py
           ls -al
