@@ -14,6 +14,5 @@ jobs:
         run: |
           cd data
           ls -la
-          # pip3 install -r requirement.txt
-          # python3 create_shopping_data.py
-          # ls -al
+          pip3 install -r requirement.txt
+          python3 create_shopping_data.py
