@@ -3,7 +3,7 @@ import json
 import os
 
 SPLIT_SIZE = 10000
-INPUT_FOLDER = "/home/runner/work/solrcloud-development-box/solrcloud-development-box/data/esci-data/shopping_queries_dataset"
+INPUT_FOLDER = "esci-data/shopping_queries_dataset"
 OUTPUT_FOLDER = "amazonshopping"
 
 
