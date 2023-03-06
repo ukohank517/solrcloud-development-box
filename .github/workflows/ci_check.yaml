@@ -1,7 +1,9 @@
 name: check_script
 on:
   pull_request:
-    types: [opened, reopened, review_requested]
+    branches:
+      - main
+      - "feature/**"
 jobs:
   script:
     runs-on: ubuntu-latest
