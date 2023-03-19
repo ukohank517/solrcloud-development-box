@@ -18,4 +18,5 @@ jobs:
         run: |
           pip3 install -r requirement.txt
       - name: build3
+        run: |
           python3 create_shopping_data.py
