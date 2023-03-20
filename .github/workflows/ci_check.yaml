@@ -24,7 +24,9 @@ jobs:
           ls -la esci-data
       - name: build2
         run: |
+          cd data
           pip3 install -r requirement.txt
       - name: build3
         run: |
+          cd data
           python3 create_shopping_data.py
