@@ -7,6 +7,9 @@ jobs:
   ci_check:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: check
         run: |
           python --version
@@ -23,9 +26,7 @@ jobs:
         run: |
           cd data
           pip3 install -r requirement.txt
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
+      - name: build3
         run: |
           cd data
           python3 create_shopping_data.py
