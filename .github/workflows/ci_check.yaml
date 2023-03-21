@@ -21,7 +21,7 @@ jobs:
       - name: build1
         run: |
           cd data
-          ls -la esci-data
+          ls -la esci-data/shopping_queries_dataset
       - name: build2
         run: |
           cd data
