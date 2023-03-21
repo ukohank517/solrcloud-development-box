@@ -11,26 +11,15 @@ jobs:
         with:
           submodules: recursive
           lfs: true
-      - name: check
-        run: |
-          python --version
-          python3 --version
-          which python
-          which python3
-          which pip
-          which pip3
-      - name: build0
-        run: |
-          git lfs pull
-      - name: build1
-        run: |
-          cd data
-          ls -la esci-data/shopping_queries_dataset
-      - name: build2
+      - name: build
         run: |
           cd data
           pip3 install -r requirement.txt
-      - name: build3
+      - name: create_data
         run: |
           cd data
           python3 create_shopping_data.py
+          python3 create_shopping_query.py > ../jmeter/benchmarks/queries.txt
+      - name: build_solr
+        run: |
+          docker-compose up -d --build
