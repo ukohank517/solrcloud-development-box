@@ -7,13 +7,13 @@ jobs:
   ci_check:
     runs-on: ubuntu-latest
     steps:
+      - name: check
+        run: |
+          cat /etc/docker/daemon.json
       - uses: actions/checkout@v2
         with:
           submodules: recursive
           lfs: true
-      - name: check
-        run: |
-          docker build --help
       - name: build
         run: |
           cd data
