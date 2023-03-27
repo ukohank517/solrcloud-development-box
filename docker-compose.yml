@@ -47,8 +47,8 @@ services:
       - /bin/bash
       - -c
       - "/opt/solr/prometheus-exporter/bin/solr-exporter -p 9854 -z zoo:2181"
-    # volumes:
-    #   - ./solr/solr-exporter-config.xml:/opt/solr/prometheus-exporter/conf/solr-exporter-config.xml
+    volumes:
+      - ./solr/solr-exporter-config.xml:/opt/solr/prometheus-exporter/conf/solr-exporter-config.xml
 
   zoo:
     image: zookeeper:3.7
@@ -64,7 +64,7 @@ services:
   prometheus:
     image: prom/prometheus
     volumes:
-      # - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus/mnt/data:/prometheus
     ports:
       - 9090:9090
