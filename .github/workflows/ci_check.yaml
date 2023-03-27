@@ -8,20 +8,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          lfs: true
-      - name: build
-        run: |
-          cd data
-          pip3 install -r requirement.txt
-      - name: create_data
-        run: |
-          mkdir -p jmeter/benchmarks
-          mkdir -p jmeter/benchmarks/benchmark-solr
-          cd data
-          python3 create_shopping_data.py
-          python3 create_shopping_query.py > ../jmeter/benchmarks/queries.txt
+      #   with:
+      #     submodules: recursive
+      #     lfs: true
+      # - name: build
+      #   run: |
+      #     cd data
+      #     pip3 install -r requirement.txt
+      # - name: create_data
+      #   run: |
+      #     mkdir -p jmeter/benchmarks
+      #     mkdir -p jmeter/benchmarks/benchmark-solr
+      #     cd data
+      #     python3 create_shopping_data.py
+      #     python3 create_shopping_query.py > ../jmeter/benchmarks/queries.txt
       - name: build_solr
         run: |
           DOCKER_BUILDKIT=1 docker-compose up -d --build
