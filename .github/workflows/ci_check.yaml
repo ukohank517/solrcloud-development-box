@@ -24,7 +24,15 @@ jobs:
       #     python3 create_shopping_query.py > ../jmeter/benchmarks/queries.txt
       - name: build_solr
         run: |
-          DOCKER_BUILDKIT=1 docker-compose up -d --build &&
+          DOCKER_BUILDKIT=1 docker-compose up -d --build
+          echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+          echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+          echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+          echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+          docker ps -a
+          echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+          echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+          echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
           docker-compose exec -T solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost zoo:2181 -cmd upconfig -confdir /opt/solr/configsets/amazonshopping -confname amazonshopping
       - name: create_collection
         run: |
