@@ -11,6 +11,9 @@ jobs:
         with:
           submodules: recursive
           lfs: true
+      - name: check
+        run: |
+          docker build --help
       - name: build
         run: |
           cd data
