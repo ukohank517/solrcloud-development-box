@@ -33,7 +33,16 @@ jobs:
           echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
           echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
           echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-          docker-compose exec -T solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost zoo:2181 -cmd upconfig -confdir /opt/solr/configsets/amazonshopping -confname amazonshopping
+          echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+
+          echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+          echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+          echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+          echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+          # docker-compose exec -T solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost zoo:2181 -cmd upconfig -confdir /opt/solr/configsets/amazonshopping -confname amazonshopping
+      - name: check_log
+        run: |
+          docker-compose logs solr1
       - name: create_collection
         run: |
           curl 'localhost:8983/solr/admin/collections?action=CREATE&name=amazonshopping&numShards=2&replicationFactor=2&maxShardsPerNode=2&collection.configName=amazonshopping'
