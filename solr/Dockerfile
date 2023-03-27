@@ -19,6 +19,8 @@ ENV SOLR_JETTY_HOST="0.0.0.0" \
     SOLR_LOGS_DIR="/var/solr/logs" \
     LOG4J_PROPS="/var/solr/log4j2.xml"
 
+RUN chmod 777 /var
+
 RUN set -ex && \
     groupadd -r --gid $SOLR_GID $SOLR_GROUP && \
     useradd -r --uid $SOLR_UID --gid $SOLR_GID $SOLR_USER && \
@@ -27,11 +29,11 @@ RUN set -ex && \
     mkdir /workspace && \
     cd /workspace && \
     if [ -n "$LUCENE_REPOSITORY" ]; then \
-        git clone $LUCENE_REPOSITORY lucene && \
-        cd lucene && \
-        git checkout ${LUCENE_CHECKOUT:-main} && \
-        ./gradlew mavenToLocal && \
-        cd ..; \
+    git clone $LUCENE_REPOSITORY lucene && \
+    cd lucene && \
+    git checkout ${LUCENE_CHECKOUT:-main} && \
+    ./gradlew mavenToLocal && \
+    cd ..; \
     fi && \
     git clone $SOLR_REPOSITORY solr && \
     cd solr && \
