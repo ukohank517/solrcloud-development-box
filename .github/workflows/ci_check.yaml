@@ -25,7 +25,8 @@ jobs:
       - name: check_befo
         run: |
           pwd
-          ls -la
+          ls -la .
+          ls -la /github/workspace
       - name: action-docker-compose
         uses: sudo-bot/action-docker-compose@latest
         with:
