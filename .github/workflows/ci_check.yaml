@@ -22,9 +22,13 @@ jobs:
       #     cd data
       #     python3 create_shopping_data.py
       #     python3 create_shopping_query.py > ../jmeter/benchmarks/queries.txt
-      - name: build_solr
+      - name: action-docker-compose
+        uses: sudo-bot/action-docker-compose@latest
+        with:
+          cli-args: "up -d"
+      - name: check
         run: |
-          DOCKER_BUILDKIT=1 docker-compose up -d --build
+          # DOCKER_BUILDKIT=1 docker-compose up -d --build
           echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
           echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
           echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"

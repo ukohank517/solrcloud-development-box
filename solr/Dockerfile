@@ -19,8 +19,6 @@ ENV SOLR_JETTY_HOST="0.0.0.0" \
     SOLR_LOGS_DIR="/var/solr/logs" \
     LOG4J_PROPS="/var/solr/log4j2.xml"
 
-RUN chmod 777 /var
-
 RUN set -ex && \
     groupadd -r --gid $SOLR_GID $SOLR_GROUP && \
     useradd -r --uid $SOLR_UID --gid $SOLR_GID $SOLR_USER && \
