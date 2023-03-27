@@ -8,26 +8,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          lfs: true
-      - name: build
-        run: |
-          cd data
-          pip3 install -r requirement.txt
-      - name: create_data
-        run: |
-          mkdir -p jmeter/benchmarks
-          mkdir -p jmeter/benchmarks/benchmark-solr
-          cd data
-          python3 create_shopping_data.py
-          python3 create_shopping_query.py > ../jmeter/benchmarks/queries.txt
+      #   with:
+      #     submodules: recursive
+      #     lfs: true
+      # - name: build
+      #   run: |
+      #     cd data
+      #     pip3 install -r requirement.txt
+      # - name: create_data
+      #   run: |
+      #     mkdir -p jmeter/benchmarks
+      #     mkdir -p jmeter/benchmarks/benchmark-solr
+      #     cd data
+      #     python3 create_shopping_data.py
+      #     python3 create_shopping_query.py > ../jmeter/benchmarks/queries.txt
       - name: build_solr
         run: |
           DOCKER_BUILDKIT=1 docker-compose up -d --build
       - name: set_amazon_configsets
         run: |
-          docker-compose exec solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost zoo:2181 -cmd upconfig -confdir /opt/solr/configsets/amazonshopping -confname amazonshopping
+          docker-compose exec -T solr1 /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost zoo:2181 -cmd upconfig -confdir /opt/solr/configsets/amazonshopping -confname amazonshopping
       - name: create_collection
         run: |
           curl 'localhost:8983/solr/admin/collections?action=CREATE&name=amazonshopping&numShards=2&replicationFactor=2&maxShardsPerNode=2&collection.configName=amazonshopping'
