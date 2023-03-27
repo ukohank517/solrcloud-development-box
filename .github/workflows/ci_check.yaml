@@ -24,7 +24,7 @@ jobs:
       #     python3 create_shopping_query.py > ../jmeter/benchmarks/queries.txt
       - name: check
         run: |
-          ls /github
+          ls -la /
       - name: action-docker-compose
         uses: sudo-bot/action-docker-compose@latest
         with:
