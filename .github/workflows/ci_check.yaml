@@ -1,28 +1,33 @@
-name: check_script
+name: CI
 
 on:
+  push:
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
         with:
-          submodules: recursive
-          # lfs: true
+          submodules: "recursive"
 
-      - name: Build and start containers
+      - name: Start containers with docker-compose
         run: |
           cd solrcloud-development-box
           docker-compose up -d
 
       - name: Wait for containers to start
-        run: sleep 10
+        run: sleep 10 # コンテナが起動するまで待つ
 
-      - name: Test Solr containers
+      - name: Test solr1 with curl
         run: |
-          curl http://localhost:8983/solr/admin/cores?action=STATUS # Solr1の通信確認
-          curl http://localhost:8984/solr/admin/cores?action=STATUS # Solr2の通信確認
+          curl http://localhost:8983/solr/admin/cores -s | grep -q solr1 || exit 1
+
+      - name: Test solr2 with curl
+        run: |
+          curl http://localhost:8984/solr/admin/cores -s | grep -q solr2 || exit 1
