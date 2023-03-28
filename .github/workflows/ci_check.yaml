@@ -11,14 +11,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository with submodule and dataset
         uses: actions/checkout@v2
         with:
           submodules: "recursive"
+          # lfs: true
 
-      - name: Start containers with docker-compose
-        run: |
-          docker-compose up -d
+      - name: Build containers with docker-compose
+        uses: sudo-bot/action-docker-compose@latest
+        with:
+          cli-args: "up -d"
 
       - name: Wait for containers to start
         run: sleep 10 # コンテナが起動するまで待つ
