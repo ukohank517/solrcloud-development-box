@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository with submodule and dataset
+        uses: actions/checkout@v2
+        # with:
+        #   submodules: "recursive"
+        #   lfs: true
+
+      - name: Check environment param
+        run: echo $GITHUB_WORKSPACE; exit
+
+      - name: Build containers with docker-compose
+        uses: sudo-bot/action-docker-compose@latest
+        with:
+          cli-args: "up -d"
+
+      - name: Wait for containers to start
+        run: sleep 10 # コンテナが起動するまで待つ
+
+      - name: Test solr1 with curl
+        run: |
+          curl http://localhost:8983/solr/admin/cores -s | grep -q solr1 || exit 1
+
+      - name: Test solr2 with curl
+        run: |
+          curl http://localhost:8984/solr/admin/cores -s | grep -q solr2 || exit 1

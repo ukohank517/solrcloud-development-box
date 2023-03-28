@@ -27,11 +27,11 @@ RUN set -ex && \
     mkdir /workspace && \
     cd /workspace && \
     if [ -n "$LUCENE_REPOSITORY" ]; then \
-        git clone $LUCENE_REPOSITORY lucene && \
-        cd lucene && \
-        git checkout ${LUCENE_CHECKOUT:-main} && \
-        ./gradlew mavenToLocal && \
-        cd ..; \
+    git clone $LUCENE_REPOSITORY lucene && \
+    cd lucene && \
+    git checkout ${LUCENE_CHECKOUT:-main} && \
+    ./gradlew mavenToLocal && \
+    cd ..; \
     fi && \
     git clone $SOLR_REPOSITORY solr && \
     cd solr && \
