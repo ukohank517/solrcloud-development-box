@@ -18,7 +18,7 @@ jobs:
         #   lfs: true
 
       - name: Check environment param
-        run: echo $GITHUB_WORKSPACE
+        run: echo $GITHUB_WORKSPACE; exit
 
       - name: Build containers with docker-compose
         uses: sudo-bot/action-docker-compose@latest
