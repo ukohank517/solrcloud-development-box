@@ -18,7 +18,6 @@ jobs:
 
       - name: Start containers with docker-compose
         run: |
-          cd solrcloud-development-box
           docker-compose up -d
 
       - name: Wait for containers to start
