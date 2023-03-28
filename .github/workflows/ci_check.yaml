@@ -13,9 +13,12 @@ jobs:
     steps:
       - name: Checkout repository with submodule and dataset
         uses: actions/checkout@v2
-        with:
-          submodules: "recursive"
-          # lfs: true
+        # with:
+        #   submodules: "recursive"
+        #   lfs: true
+
+      - name: Check environment param
+        run: echo $GITHUB_WORKSPACE
 
       - name: Build containers with docker-compose
         uses: sudo-bot/action-docker-compose@latest
